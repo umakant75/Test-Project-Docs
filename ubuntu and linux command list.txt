@@ -1,0 +1,137 @@
+Introduction to Linux command ‘sudo’
+sudo stands for superuser do. In Ubuntu Linux there is not root account configured by default. If users want root account password then they can manually set it up oo can use ‘sudo’. As we all know, Linux in many ways protects users’ computer being used for bad purposes by some nasty people around us. Using sudo is one of those good ways.
+sudo command works in conjunction with security policies, default security policy is sudoers and it is configurable via /etc/sudoers file. Its security policies are highly extendable. One can develop and distribute their own policies as plugins.
+
+1) Edit /etc/sudoers file as follows:
+	sudo visudo
+
+2) Add below line to allow sudo access to user linuxtechi:
+
+	linuxtechi ALL=(ALL) ALL
+
+
+Install Sudo on Ubuntu and Debian
+	apt install sudo
+
+user wants to update the operating system by passing command – 	
+	apt-get update
+
+The above command will give following error-
+	apt-get update error
+
+This error is due to not having root privileges to the user ‘sandy’. The root privileges can be required by passing sudo at the very beginning, like below-
+	sudo apt-get update
+
+This command will install packages with the root privileges.
+	sudo apt-get install {package-name}
+
+This command will remove packages with the root privileges.
+	sudo apt-get remove {package-name}
+
+This command will update packages with the root privileges.
+	sudo apt-get update {package-name}
+
+The Linux command ‘su’ is used to switch from one account to another. User will be prompted for the password of the user switching to.
+	$ su linuxandubuntu
+	password:
+	linuxandubuntu@sandy:~$
+
+On Debian, Ubuntu and their derivatives, members of the group sudo are granted with sudo access:
+	usermod -aG sudo username
+
+By default, sudo will ask you to enter your password again after five minutes of sudo inactivity. You can change the default timeout by editing the sudoers file. Open the file with visudo: 
+
+Set the default timeout by adding the line below, where 10 is the timeout specified in minutes:
+	Defaults  timestamp_timeout=10
+
+
+1. Essential commands
+
+Navigation: pwd, ls path, cd folder_path. Definition of path (computing).
+Help: man command, command --help, command -h, Explainshell.
+Manipulation: cp, mv, rm, mkdir, ln.
+Permissions: chmod, chown, chgrp, su, sudo (enable sudo on Debian).
+Display a line of text: echo, echo $PATH (show the content of variable $PATH).
+Text editor: nano.
+Visualization: cat, more, less, head, tail.
+Redirect standard output to a file: command > file.
+Execute multiple commands (AND): command1 && command2 && commandN.
+Execute a command in the background: command &.
+Run an executable in the current directory that is not in your $PATH: ./executable.
+Run a Bash script: bash script.sh. Executable with header #!/bin/bash.
+
+2. APT commands
+Install a package locally: sudo apt-get install ./package.deb.
+Install a package from the repository: sudo apt-get install package.
+Uninstall a package from the repository: sudo apt-get purge package.
+Remove packages that are no longer needed: sudo apt-get autoremove.
+Resynchronize the package index files from /etc/apt/sources.list: sudo apt-get update.
+Install the newest versions of all packages from /etc/apt/sources.list: sudo apt-get upgrade.
+
+3. Bash shortcuts
+Autocomplete files, folders, commands, packages, etc.: Tab.
+List all available files, folders, commands, packages, etc.: Tab + Tab.
+Go to previous command: ?, or Ctrl + P.
+Go to next command: ?, or Ctrl + N.
+Search through previously used commands: Ctrl + R.
+Terminate the current process (SIGINT): Ctrl + C.
+Suspend the current process (SIGTSTP): Ctrl + Z.
+
+4. Basic commands
+Show and/or admin current processes: jobs, ps, top.
+Send a signal to a process: kill.
+List files in databases that match a pattern: locate, sudo updatedb.
+Print lines matching a pattern from a text file: grep.
+Show/manipulate routing, devices, policy routing and tunnels: ip.
+OpenSSH SSH client with X11 forwarding: ssh user@server -X.
+Secure copy (remote file copy program): scp.
+
+5. Screen commands
+Create a screen session: screen.
+Detach from the current screen session: Ctrl + A then D.
+List the screen session identification strings: screen -ls.
+Reattach to a screen session: screen -r session_id_string.
+Terminate the current screen session: exit, or Ctrl + A then :quit.
+Scroll up/down during session: Ctrl + A then Esc then ?/?/PgUp/PgDn.
+
+6. Other commands
+Print newline, word, and byte counts for each file: wc.
+Extract an ISO file: 7z x filename.iso.
+Report faked system time to programs: faketime.
+Retrieves files from the web: wget.
+Print shared library dependencies: ldd executable_filename.
+Make symbolic links: ln -s input_filename output_link_name.
+List block devices: lsblk.
+Format USB stick as VFAT: sudo mkfs.vfat -I /dev/sdx -n NAME && sync.
+Restore disk from image: sudo dd bs=1M if=im.iso of=/dev/sdx && sync.
+Report disk space usage: df -H, du -hs folder.
+Compare files line by line: diff.
+
+7. FFmpeg commands
+Convert image to 5 sec. video: ffmpeg -loop 1 -i 01.png -t 5 out.mp4.
+15 images to 30 Hz 5 sec. video: ffmpeg -r 3 -i %03d.png -r 30 out.mp4.
+Resize video to 720p: ffmpeg -i input.webm -s 1280x720 output.webm.
+Fade in the first 25 frames and fade out the last 25 frames of a 1000-frame video: ffmpeg -i in.mp4 -vf 'fade=in:0:25, fade=out:975:25' out.mp4.
+Concatenate videos: ffmpeg -f concat -i mylist.txt -c copy out.mp4.
+
+8. SVN commands
+Create new repository: svnadmin create repository_name.
+Checkout: svn co svn+ssh://user@server/path/to/repository.
+Update working copy: svn update.
+Get status of current copy: svn status.
+Add all items recursively: svn add *.
+Add an item (if folder, adds recursively): svn add item_name.
+Delete an item (if folder, deletes recursively): svn delete item_name.
+Commit with log message: svn commit -m 'message'.
+
+9. Find command
+Find files and folders recursively in current directory: find ..
+Run files recursively in current dir.: find . -type f -exec file '{}' \;.
+Delete all .svn folders: find . -iname .svn -prune -exec rm -r '{}' \;.
+Copy all png files to png: find ./ -name *.png -exec cp '{}' ./png \;.
+
+10. PDFtk examples
+Join all PDF files into a new PDF file: pdftk *.pdf cat output out.pdf.
+Join 3 PDF files: pdftk in1.pdf in2.pdf in3.pdf cat output out.pdf.
+Extract pages from a PDF: pdftk in.pdf cat 1 25-35 end output out.pdf.
+
