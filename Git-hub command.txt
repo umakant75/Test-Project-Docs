@@ -1,0 +1,244 @@
+Create New User
+# add new group
+[root@CentOS ~]# groupadd dev
+
+# add new user
+[root@CentOS ~]# useradd -G devs -d /home/gituser -m -s /bin/bash gituser
+
+# change password
+[root@CentOS ~]# passwd gituser
+---------------------------------------------------------------------------------
+Create a Bare Repository
+
+[gituser@CentOS ~]$ pwd
+/home/gituser
+
+[gituser@CentOS ~]$ mkdir project.git
+
+[gituser@CentOS ~]$ cd project.git/
+
+[gituser@CentOS project.git]$ ls
+
+[gituser@CentOS project.git]$ git --bare init
+Initialized empty Git repository in /home/gituser-m/project.git/
+
+[gituser@CentOS project.git]$ ls
+branches config description HEAD hooks info objects refs
+------------------------------------------------------------------------------------
+Generate Public/Private RSA Key Pair
+
+tom@CentOS ~]$ pwd
+/home/tom
+
+[tom@CentOS ~]$ ssh-keygen
+
+Note: Never share your PRIVATE KEY with others.
+ssh-keygen has generated two keys, first one is private (i.e., id_rsa) and the second one is public (i.e., id_rsa.pub).
+-----------------------------------------------------------------------------------
+
+Adding Keys to authorized_keys
+
+[tom@CentOS ~]$ ssh-copy-id -i ~/.ssh/id_rsa.pub gituser@git.server.com
+-----------------------------------------------------------------------------
+
+Push Changes to the Repository
+
+[tom@CentOS ~]$ pwd
+/home/tom
+
+[tom@CentOS ~]$ mkdir tom_repo
+
+[tom@CentOS ~]$ cd tom_repo/
+
+[tom@CentOS tom_repo]$ git init
+Initialized empty Git repository in /home/tom/tom_repo/.git/
+
+[tom@CentOS tom_repo]$ echo 'TODO: Add contents for README' > README
+
+[tom@CentOS tom_repo]$ git status -s
+?? README
+
+[tom@CentOS tom_repo]$ git add .
+
+[tom@CentOS tom_repo]$ git status -s
+A README
+
+[tom@CentOS tom_repo]$ git commit -m 'Initial commit'
+-----------------------------------------------------------------------------------
+git log command to view log details.
+
+[jerry@CentOS project]$ git log
+------------------------------------------------------------------------------------
+Create Branch
+[jerry@CentOS src]$ git branch new_branch
+
+[jerry@CentOS src]$ git branch
+* master
+new_branch
+-------------------------------------------------------------------------------------
+Switch between Branches
+the git checkout command to switch between branches.
+
+[jerry@CentOS src]$ git checkout new_branch
+Switched to branch 'new_branch'
+[jerry@CentOS src]$ git branch
+master
+* new_branch
+---------------------------------------------------------------------------------------
+Shortcut to Create and Switch Branch
+
+[jerry@CentOS src]$ git checkout -b test_branch
+Switched to a new branch 'test_branch'
+
+[jerry@CentOS src]$ git branch
+master
+new_branch
+* test_branch
+--------------------------------------------------------------------------------------
+Delete a Branch
+
+[jerry@CentOS src]$ git branch
+master
+new_branch
+* test_branch
+
+[jerry@CentOS src]$ git checkout master
+Switched to branch 'master'
+
+[jerry@CentOS src]$ git branch -D test_branch
+Deleted branch test_branch (was 5776472).
+------------------------------------------------
+[jerry@CentOS src]$ git branch
+* master
+new_branch
+-----------------------------------------------------
+Rename a Branch
+[jerry@CentOS src]$ git branch
+* master
+new_branch
+
+[jerry@CentOS src]$ git branch -m new_branch wchar_support
+----------------------------------------------------------------------------
+
+Merge Two Branches
+[jerry@CentOS src]$ git branch
+master
+* wchar_support
+
+[jerry@CentOS src]$ pwd
+/home/jerry/jerry_repo/project/src
+
+[jerry@CentOS src]$ git diff
+
+[jerry@CentOS src]$ git status -s
+M string_operations.c
+?? string_operations
+
+[jerry@CentOS src]$ git add string_operations.c
+
+[jerry@CentOS src]$ git commit -m 'Added w_strlen function to return string lenght of wchar_t
+string'
+
+[wchar_support 64192f9] Added w_strlen function to return string lenght of wchar_t string
+1 files changed, 10 insertions(+), 0 deletions(-)
+
+[jerry@CentOS src]$ git push origin wchar_support   <--- Observer branch_name
+
+[tom@CentOS src]$ pwd
+/home/tom/top_repo/project/src
+
+[tom@CentOS src]$ git log origin/wchar_support -2
+
+[tom@CentOS project]$ git branch
+* master
+
+[tom@CentOS project]$ pwd
+/home/tom/top_repo/project
+
+[tom@CentOS project]$ git merge origin/wchar_support
+Updating 5776472..64192f9
+Fast-forward
+src/string_operations.c | 10 ++++++++++
+1 files changed, 10 insertions(+), 0 deletions(-)
+------------------------------------------------------------------------------------
+Create GitHub Repository
+Go to github.com. 
+
+Push Operation
+Tom decides to use the GitHub server. To start a new project, he creates a new directory and one file inside that.
+
+[tom@CentOS]$ mkdir github_repo
+
+[tom@CentOS]$ cd github_repo/
+
+[tom@CentOS]$ vi hello.c
+
+[tom@CentOS]$ make hello
+cc hello.c -o hello
+
+[tom@CentOS]$ ./hello
+
+[tom@CentOS]$ git init
+Initialized empty Git repository in /home/tom/github_repo/.git/
+
+[tom@CentOS]$ git status -s
+?? hello
+?? hello.c
+
+[tom@CentOS]$ git add hello.c
+
+[tom@CentOS]$ git status -s
+A hello.c
+?? hello
+
+[tom@CentOS]$ git commit -m 'Initial commit'
+
+[tom@CentOS]$ git remote add origin https://github.com/kangralkar/testing_repo.git
+
+[tom@CentOS]$ git push -u origin master
+=----------------------------
+Pull Operation
+[jerry@CentOS]$ pwd
+/home/jerry
+
+[jerry@CentOS]$ mkdir jerry_repo
+
+[jerry@CentOS]$ git clone https://github.com/kangralkar/test_repo.git
+--------------------------------------------------------------------------
+Customize Git Environment
+Setting username
+This information is used by Git for each commit.
+
+[jerry@CentOS project]$ git config --global user.name "Jerry Mouse"
+Setting email id
+This information is used by Git for each commit.
+
+[jerry@CentOS project]$ git config --global user.email "jerry@tutorialspoint.com"
+Avoid merge commits for pulling
+You pull the latest changes from a remote repository, and if these changes are divergent, then by default Git creates merge commits. We can avoid this via following settings.
+
+jerry@CentOS project]$ git config --global branch.autosetuprebase always
+Color highlighting
+The following commands enable color highlighting for Git in the console.
+
+[jerry@CentOS project]$ git config --global color.ui true
+
+[jerry@CentOS project]$ git config --global color.status auto
+
+[jerry@CentOS project]$ git config --global color.branch auto
+Setting default editor
+By default, Git uses the system default editor, which is taken from the VISUAL or EDITOR environment variable. We can configure a different one by using git config.
+
+[jerry@CentOS project]$ git config --global core.editor vim
+Setting default merge tool
+Git does not provide a default merge tool for integrating conflicting changes into your working tree. We can set default merge tool by enabling following settings.
+
+[jerry@CentOS project]$ git config --global merge.tool vimdiff
+Listing Git settings
+To verify your Git settings of the local repository, use git config –list command as given below.
+
+[jerry@CentOS ~]$ git config --list
+-------------------------------------
+
+
+
