@@ -1,0 +1,132 @@
+Playbooks are divided into 3 sctions:
+
+1.   targer section :- which host and how
+
+2.  Veriable sction :- Optional 
+
+3.  Tasks section :- list all the module that you intende to learn in which order.
+
+===============================
+pwd
+hostnames
+rpm -q https
+systemctl status https
+
+------
+vim testone.yml
+---
+  -hosts : anstwo.example.com
+   user: root
+  vers:
+     motd-welcome: 'Welcome to *** Live , love,leard Linux\'
+  tasks:
+  - name : Sample motd
+    copy:
+    dest: /etc/motd
+    content: "{{motd_welcom}}"
+--
+:wq!
+asnible playbook testone.yml
+=================
+
+vim testtwo.yml
+---
+  - hosts: anstwo.exemle.com
+    user: root
+    tasks:
+    - name: copy repo file
+     copy: src=files/ser.repo dest=/etc/yum.repos.d/ser/repo
+    -name: installing httpd
+     action: 
+        yum: name=httpd state=installed or present or latest
+    -name: copy index.html
+     copy src=files/index.html dest=/var/www/html/index.html
+    -name: start apache
+     service 
+      name : httpd
+      state: restarted
+:wq!
+
+ansible playbook testtwo.yml
+
+==============
+index.html
+
+<html>
+<h>
+Apache configured with using ansible playbook
+</h>
+</html>
+
+==========================
+
+ansible-playbook install.yml --sysntax-check
+
+ansible-playbook -v testtwo.yml
+
+ansible-playbook -v testtwo.yml --step
+
+=========================
+defult inventory file 
+ll  /etc/ansible/hosts
+
+-----
+client confirmation
+
+$ rpm -q httpd
+systemctl status https
+==========================================
+---
+- hosts: all
+  tasks:
+  - name: ensure apache is at the latest version
+    yum: write the apache config file
+    template: src=root/httpd.new dest=/etc/https.conf
+    notify:
+    - restart apache
+  - name: ensure apache is running (and enable it at boot)
+    service: name=httpd state=started enabled=yes
+  handlers:
+   -name: restart apache
+    service: name=https state=restarted
+===================  
+
+Host inventory files
+by default file located 
+ /etc/ansible/
+ file called hosts
+
+ansible all -m ping
+
+Group 
+ansible test -m ping
+
+ansible test -m shell -a "uptime"
+
+by pass default location
+
+ansible -i /root/hostfile test -m shell -a "uptime"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
