@@ -1,0 +1,126 @@
+1.  First login to your private repository by running.
+$ docker login [repository_url]
+
+2.  Above step updates $HOME/.docker/config.json. You can open and verify this file.
+
+3.  Get all Nodes in your cluster.
+Get by Names
+$ nodes=$(kubectl get nodes -o jsonpath='{range.items[*].metadata}{.name} {end}')
+
+Get by IPs
+$ nodes=$(kubectl get nodes -o jsonpath='{range .items[*].status.addresses[?(@.type=="ExternalIP")]}{.address} {end}')
+
+4.  Copy the docker config to each node.
+
+for n in $nodes; do 
+ scp ~/.docker/config.json root@$n:/var/lib/kubelet/config.json;
+ done
+
+5.   Now you can verify the above steps by creating a Pod that pulls an image from a private repo.
+
+kubectl create -f - <<EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: private-image-testing
+spec:
+  containers:
+    - name: private-image-test
+      image: $YOUR_PRIVATE_IMAGE_NAME
+      imagePullPolicy: Always
+      command: [ "echo", "SUCCESS" ]
+EOF
+********************************************
+should be able to see pod/private-image-test-1 created. Indicates image pulled successfully.
+
+1.  Follow these steps to specify secret at pod level:
+
+Create a secret with Registry credentials.
+kubectl create secret docker-registry myregistrysecret --docker-server=DOCKER_REGISTRY_SERVER_URL --docker-username=DOCKER_USER_NAME --docker-password=DOCKER_PASSWORD --docker-email=DOCKER_EMAIL_ID
+This will output secret/myregistrysecret created . 
+
+2.   Create Pod deployment yaml.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app_name
+  namespace: name_space
+spec:
+  containers:
+    - name: app_name
+      image: YOUR_PRIVATE_IMAGE
+  imagePullSecrets:
+    - name: myregistrysecret
+Now deploy Pod with Image Secret.
+kubectl create -f <above_pod_spec.yaml>
+
+3. Follow these steps to deploy secret using yaml and use it with Pod.
+
+Encode .docker/config.json content to base64.
+cat $HOME/.docker/config.json | base64
+The above command will give base64 version of docker config. save it somewhere. 2. Create secret yaml file.
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: myregistrysecret
+  namespace: name_space
+data:
+  .dockerconfigjson: COPIED_BASE64_STRING   
+type: kubernetes.io/dockerconfigjson
+
+4.  Secret at pod level approach steps contd...
+
+Deploy the secret.
+
+kubectl create -f <above_secret_file.yaml>
+Create Pod deployment yaml.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app_name
+  namespace: name_space
+spec:
+  containers:
+    - name: app_name
+      image: YOUR_PRIVATE_IMAGE
+  imagePullSecrets:
+    - name: myregistrysecret
+Now deploy Pod with Image Secret.
+kubectl create -f <above_pod_spec.yaml>
+
+---------------------------
+
+Follow these steps to implement container lifecycle hooks:
+
+1.  Add hook property to pod description yaml.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: lifecycle-hook-demo
+spec:
+  containers:
+  - name: lifecycle-hook-container
+    image: nginx
+    lifecycle:
+      postStart:
+        exec:
+          command: ["/bin/sh", "-c", "echo Hello from Fresco Team> /usr/share/message"]
+      preStop:
+        exec:
+          command: ["/usr/sbin/nginx","-s","quit"]
+
+
+2.  Create the Pod.
+kubectl create -f <above_config.yaml>
+
+3.  To verify the step, get inside the container.
+kubectl exec -it lifecycle-hook-demo -- /bin/bash
+
+4.  Use cat the file to see a message
+ cat /usr/share/message
+
+You should see Hello from Fresco Team message.
+
+
