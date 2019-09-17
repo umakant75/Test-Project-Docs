@@ -1,0 +1,1345 @@
+You should see Hello from Fresco Team message.
+minikube to start.
+$ minikube start
+
+
+1.   Deploy a nginx pod
+         Save 'yaml' as 'pod-conf.yaml'.
+
+$  echo "apiVersion: v1
+kind: Pod
+metadata:
+    name: lifecycle-hook-demo
+spec:
+    containers:
+        -
+            name: lifecycle-hook-container
+            image: nginx
+            lifecycle: {postStart: {exec: {command: [/bin/sh, '-c', 'echo Hello from Fresco Team > /usr/share/message']}}, preStop: {exec: {command: [/usr/sbin/nginx, '-s', quit]}}}">pod-conf.yaml
+
+---------------
+Create the pod:
+
+$ kubectl create -f pod-conf.yaml
+          pod/lifecycle-hook-demo created
+
+---------------------------------
+
+Check if the command is executed or not.
+
+List all the pods: 
+$  kubectl get pods
+------------------
+Onec pods get running ....
+Grab the lifecycle-hook-demo pod and enter:
+$ kubectl exec -it lifecycle-hook-demo -- /bin/bash
+
+root@lifecycle-hook-demo:/#
+--------------------
+You are in the nginx container.
+
+Cat the message:
+
+$ cat /usr/share/message
+
+You should be able to view the message Hello from Fresco Team.
+
+root@lifecycle-hook-demo:/# cat /usr/share/message
+~~~~~~~~~~~~~~~~~
+Hello from Fresco Team
+~~~~~~~~~~~~~~~~~
+********************************************************************8
+Create a Pod
+xxxxx
+minikube to start.
+$ minikube start
+
+Open the nano/vi editor, and paste yaml code, and save file as pod-conf.yaml.
+
+$ echo "apiVersion: v1
+kind: Pod
+metadata:
+    name: nginx
+    labels:
+        name: nginx
+spec:
+    containers:
+        -
+            name: nginx
+            image: nginx
+            ports: [{containerPort: 80}]">pod-conf.yaml
+
+----------------
+Create the Pod:
+
+kubectl create -f pod-conf.yaml
+
+---------
+
+Wait for the pod to be created.
+
+Verify by running: kubectl get pods
+
+------------------------------
+Connect to nginx
+xxxxx
+Since the container cannot be directly accessed inside the pod, a service or port-forward facility must be used.
+
+Use port-forward, and run the following command: 
+$ kubectl port-forward nginx 8001:80 &
+
+The 80 port will be mapped inside the nginx pod, to the host's 8001 port.
+----
+
+Curl to localhost:8001: 
+
+$ curl localhost:8001
+
+
+*********************************************************************
+Kubernetes Namespaces
+xxxxxx
+
+minikube cluster: 
+$ minikube start
+---------------
+Create a namespace
+List all the namespaces: 
+$  kubectl get namespaces
+
+AME          STATUS    AGE
+default       Active    10s
+kube-public   Active    10s
+kube-system   Active    10s
+----------------
+Open the nano/vim editor, paste 'yaml', and save it as 'ns.yaml'.
+
+$ echo "apiVersion: v1
+kind: Namespace
+metadata:
+  name: testns">nsl.yaml
+
+------
+
+Create the namespace: 
+
+$  kubectl create -f ns.yaml
+----------------
+
+List all the namespaces again:
+
+$ kubectl get namespaces
+-----------------
+
+Deploy a pod to namspce
+Deploy nginx to the testns namespace:
+
+$ kubectl run ngnix --image=nginx --replicas=2 --namespace=testns
+	deployment.apps/ngnix created
+---------------
+
+Get the pods: 
+$ kubectl get pods
+-	Nothing is displayed, because Kubernetes uses the default namespace. Therefore, grab pods from the testns namespace: 
+
+---------------------------
+kubectl get pods -n testns
+-----------------------------------------
+
+Note: You can also execute 
+ $  kubectl get pods --all-namespaces 
+
+to view all pods across the namespaces.
+
+***************************************************************************
+
+***********************************
+Kubernetes Deployment
+xxxxxxx
+
+minikube to start.
+$ minikube start
+-----------------------
+Create a deployment
+Save the following 'yaml' as depl.yaml:
+
+echo "apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: nginx-test-deployment
+    labels:
+        app: nginx-test
+spec:
+    replicas: 2
+    selector:
+        matchLabels:
+            app: nginx-test
+    template:
+        metadata:
+            labels: {app: nginx-test}
+        spec:
+            containers: [{name: nginx-test, image: 'nginx:1.15', ports: [{containerPort: 80}]}]">depl.yaml
+
+--------------------
+Create the deployment by running: 
+
+$ kubectl apply -f depl.yaml
+              
+deployment.apps/nginx-test-deployment created
+
+--------------
+Check the pod status by running: 
+$ kubectl get pods
+---------------
+
+Scale deployment
+List all the deployment:
+
+$ kubectl get deploy
+
+NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+nginx-test-deployment   2         2         2            2           3m
+
+--------------------------
+
+Scale the deployment to 4 pods.
+edit file depl.yaml
+vi edpl.yaml
+
+insert :i , save and quit wq
+----------------------------
+
+Check the status of the deployment by running
+$ kubectl rollout status deployment nginx-test-deployment
+
+$ kubectl apply -f depl.yaml
+$ kubectl get pods
+$ kubectl get deploy
+$ kubectl rollout status deployment nginx-test-deployment
+------------------
+$ kubectl get pods
+NAME                                   READY     STATUS    RESTARTS   AGE
+nginx-test-deployment-bdd4d5b7-ctk2x   1/1       Running   0          2m
+nginx-test-deployment-bdd4d5b7-d8tzw   1/1       Running   0          2m
+nginx-test-deployment-bdd4d5b7-m6kbr   1/1       Running   0          13s
+nginx-test-deployment-bdd4d5b7-wsftm   1/1       Running   0          13s
+$ kubectl get deploy
+NAME                    DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+nginx-test-deployment   4         4         4            4           2m
+$ kubectl rollout status deployment nginx-test-deployment
+deployment "nginx-test-deployment" successfully rolled out
+
+---------------------------------------------------------------------------------------------------
+
+Change nginx image
+Update the nginx image running in nginx-test-deployment to 1.9.1.
+
+edit file depl.yaml
+vi edpl.yaml
+insert :i , save and quit wq
+
+Check the status of the deployment by running:
+$ kubectl rollout status deployment nginx-test-deployment
+
+$ kubectl apply -f depl.yaml
+$ kubectl get pods
+$ kubectl get deploy
+$ kubectl rollout status deployment nginx-test-deployment
+
+Verify the change: 
+kubectl describe deployment
+
+********************************
+
+
+###################################################################
+
+Use the run command ;
+
+$ kubectl run my-first-nginx  --image=nginx "my-first-nginx"
+
+user the create -f command with the yaml file:
+
+vi nginx.yaml
+-----------
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+    name: my-first-nginx
+    labels: 
+       app: nginx
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+             app: nginx
+   template:
+     metadata:
+           labels:
+              app: nginx
+    spec:
+        containers:
+        - name: nginx
+          image: nginx
+
+---------------
+$ kubectl create -f nginx.yaml
+
+-------------
+$ kubectl get deployment   or deploy
+
+------------------
+
+$ kubectl run my-first-nginx  --image=nginx "my-first-nginx"
+
+-----------
+$ kubectl delete deploy my-first-nginx
+
+----------------
+
+##########################################################333
+
+Downloading a docker image
+
+$ minikube ssh
+
+$ docker pul centos
+
+-----------------------------------
+A pods has 2 containers
+
+vi my-first-pod.yaml
+
+---
+
+echo"apiVersion: v1
+kind: Pod
+metadata:
+    name: my-first-pod
+spec:
+    containers:
+    - name: my-nginx
+      image: nginx
+    - name: mycentos
+      image: centos
+      command: ["/bin/sh", "-c", "while   :  ; ddo curl
+  http://localhost:80/; sleep 10; done"]">my-first-pod.yaml
+
+------------------
+
+$ kubectl create -f my-first-pod.yaml
+
+$ kubectl get pod    or pods
+
+------------
+
+$ kubectl exec my-first-pod  -it -c my-centos  -- /bin/bash
+
+
+if two or more nodes can check the -o wide
+
+$ kubectl get pods -o wide
+
+===================================
+
+launch a second pod, rename it
+
+$ cat my-first-pod.yaml  | 's/my-first-pod/my-second-pod/' > my-second-pod.yaml
+
+
+---------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+    name: my-second-pod
+spec:
+    containers:
+    - name: my-nginx
+      image: nginx
+    - name: mycentos
+      image: centos
+      command: ["/bin/sh", "-c", "while   :  ; ddo curl
+  http://localhost:80/; sleep 10; done"]
+
+------------------------
+
+$ kubectl create -f my-second-pod.yaml
+
+$ kuberctl get pod    or pods
+
+-----------------
+$ kubectl delete pods --all
+
+------------
+
+$ kubectl get pods
+
+################################################
+Create a RelicaSet
+--------
+vi my-first-replicaset.yaml
+---------------
+
+$ echo "apiVersion: extensions/v1beta1
+kind: ReplicaSet
+metadata:
+    name: my-first-replicaset
+    labels:
+       version: 0.0.1
+spec:
+    replicas: 3
+    selector:
+    matchLabels:
+         project: My-Happy-Web
+         role: frontend
+template:
+   metadata:
+   labels:
+        project: My-Happy-Web
+        role: frontend
+        env: dev
+spec:
+    containers:
+    - name: happy-web
+      image: nginx:latest">my-first-replicaset.yaml
+--------------------------
+$ kubectl create -f my-first-replicaset.yaml
+    replicaset.extensions "my-first-replicaset" created
+-------------------
+$ kubectl get rs
+
+--------------
+$ kubectl describe rs my-first-replicaset
+
+-------------------------
+
+$ kubectl describe pod my-first-replicaset-xcrws
+------------------------------
+
+Changing the configuration of a ReplicaSet
+
+$ kubectl get rs
+
+------------------
+$ kubectl edit rs my-first-replicaset
+or 
+
+$ vi my-first-replicaset.yaml
+
+$ kubectl get rs
+
+-------------------------
+$ time kubectl delete rs my-first-replicaset && kubectl get pod
+
+-------------------------
+$ kubectl get rs,pod
+-----------------------------
+
+// use subcommand "run" with tag restart=Never to create a Pod
+
+$ kubectl run standalone-pod --image=centos --labels="project=My-Happy-
+Web,role=frontend,env=test" ---restart=Never --command sleep 3600
+pod "standalone-pod" created
+
+---------------------------------
+// check Pod along with the labels
+$ kubectl get pod -L project -L role -L env
+
+-------------------------
+$ kubectl describe pod standalone-pod
+----------------
+
+// remove the ReplicaSet and check pods immediately
+$ kubectl delete rs my-first-replicaset && kubectl get pod
+replicaset.extensions "my-first-replicaset" deleted
+
+##########################################
+This example is an equivalent of kubectl run my-nginx --image=nginx:1.11.0 --
+port=80 --replicas=3:
+---------------------
+
+$echo"apiVersion: apps/v1
+kind: Deployment
+   metadata:
+   name: my-nginx
+spec:
+   replicas: 3
+   selector:
+       matchLabels:
+            run: my-nginx
+template:
+    metadata:
+    labels:
+           run: my-nginx
+spec:
+   containers:
+   - name: my-nginx
+     image: nginx:1.11.0
+     ports:
+     - containerPort: 80">deploy.yaml
+-------------------------
+
+$ kubectl create -f deploy.yaml --save-config --record
+
+-----------------------------
+//check my-nginx Deployment
+$ kubectl get deploy
+---------------
+
+$ kubectl describe deploy my-nginx
+
+--------------------------
+
+Use the kubectl set command allows us to overwrite
+
+$ kubectl set image deployment my-nginx my-nginx=nginx:1.12.0 --record
+deployment.apps "my-nginx" image updated
+
+-------------------------
+$ kubectl describe deploy my-nginx
+
+-------------------------------
+
+$ kubectl get rs
+
+----------------
+
+$ kubectl rollout history deployment my-nginx
+
+---------------------
+For demo purposes, copy deploy.yaml to deploy_1.12.2.yaml and change the nginx
+version to 1.12.2, as follows:
+image: nginx:1.12.2
+Then run the kubectl apply command with the --record option:
+
+$ kubectl apply -f deploy_1.12.2.yaml --record
+deployment.apps "my-nginx" configured
+
+----
+$ kubectl describe deploy my-nginx
+------
+
+$ kubectl get rs
+
+---------------
+
+
+#####################################################################
+Working with Services
+
+$ sudo netstat -tulpn | grep kube-proxy
+
+-----------
+Creating a Service for a Pod
+// using subcommand "run" with "never" restart policy, and without replica, you can get a Pod
+// here we create a nginx container with port 80 exposed to outside world of Pod
+----------
+$ kubectl run nginx-pod --image=nginx --port=80 --restart="Never" --
+labels="project=My-Happy-Web,role=frontend,env=test"
+------------
+pod "nginx-pod" created
+
+// expose Pod "nginx-pod" with a Service officially with port 8080, target port would be the exposed port of pod
+------------
+$ kubectl expose pod nginx-pod --port=8080 --target-port=80 --name="nginxservice"
+---------
+service "nginx-service" exposed
+ --------------
+
+// "svc" is the abbreviate of Service, for the description's resource type
+
+$ kubectl describe svc nginx-service
+------------
+// create a Pod and a Service for it
+---
+$ kubectl run nginx-no-label --image=nginx --port=80 --restart="Never" &&
+kubectl expose pod nginx-no-label
+---
+pod "nginx-no-label" created
+service "nginx-no-label" exposed
+-------------------------------
+$ kubectl describe svc nginx-no-label
+
+---------------
+// through leveraging tag "--expose", create the Service along with Pod
+---
+$ kubectl run another-nginx-no-label --image=nginx --port=80 --
+restart="Never" --expose
+-----
+service "another-nginx-no-label" created
+pod "another-nginx-no-label" created
+
+----------------------------
+Creating a Service for a Deployment with an external IP
+
+// using subcommand "run" and assign 2 replicas
+
+$ kubectl run nginx-deployment --image=nginx --port=80 --replicas=2 --
+labels="env=dev,project=My-Happy-Web,role=frontend"
+deployment.apps "nginx-deployment" created
+
+// explicitly indicate the selector of Service by tag "--selector", and assign the Service an external IP by tag "--external-ip"
+// the IP 192.168.122.102 demonstrated here is the IP of one of the Kubernetes node in system
+
+$ kubectl expose deployment nginx-deployment --port=8080 --target-port=80 -
+-name="another-nginx-service" --selector="project=My-Happy-
+Web,role=frontend" --external-ip="192.168.122.102"
+
+service "another-nginx-service" exposed
+-----------------
+
+$ kubectl describe svc another-nginx-service
+
+$ curl 192.168.122.102:8080
+--------------
+Creating a Service for an Endpoint without a selector
+
+$ echo"
+apiVersion: v1
+kind: Endpoints
+   metadata:
+   name: k8s-ep
+subsets:
+  - addresses:
+  - hostname: kubernetes-io
+    ip: 45.54.44.100
+    ports:
+    - port: 80">k8s-endpoint.yaml
+------------------
+
+// Give it a try!
+$ kubectl expose -f k8s-endpoint.yaml
+error: cannot expose a { Endpoints}
+
+-------------------
+
+$ echo"
+apiVersion: v1
+kind: Service
+   metadata:
+   name: k8s-ep
+spec:
+   ports:
+   - protocol: TCP
+   port: 8080
+  targetPort: 80">endpoint-service.yaml
+
+--------------
+
+// go create the Service and the endpoint
+$ kubectl create -f endpoint-service.yaml && kubectl create -f k8sendpoint.
+yaml
+
+service "k8s-ep" created
+endpoints "k8s-ep" created
+
+// verify the Service k8s-ep
+$ kubectl describe svc k8s-ep
+
+---------------------
+$ curl 10.105.232.226:8080
+
+--------------------------------
+Creating a Service for another Service with session affinity
+
+// create a Service by expose an existed one
+// take the one we created for Deployment for example
+
+$ kubectl expose svc another-nginx-service --port=8081 --target-port=80 --
+name=yet-another-nginx-service --session-affinity="ClientIP"
+service "yet-another-nginx-service" exposed
+
+// check the newly created Service
+
+$ kubectl describe svc yet-another-nginx-service
+	
+------------
+Deleting a Service
+
+$ kubectl delete svc,ep k8s-ep
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Let's practice!
+
+Create namespace: lab1
+Create a pod with the following constraints:
+
+Pod name: happyelephant
+Deploy pod in a lab1 namespace
+Add 3 labels
+Use this container image: jenkins:2.13.0
+Set the container with 8080 port
+Check happyelephant is running successfully
+Delete happyelephant pod (remember set up path: /pods-manifests/)
+
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+default  :  All objects created without specifying a namespace will automatically be created in the default namespace.
+
+1.    This namespace is empty and doesn't contain any objects:
+
+$   kubectl get pods -n default; echo
+
+2.   Creating a namespace can be done with a single command. Let's create dev-service1 namespace:
+
+$   kubectl create namespace dev-service1
+
+3.   test-namespace.yaml
+
+$ echo "
+kind: Namespace
+
+apiVersion: v1
+
+metadata:
+
+  name: testl"> test-namespace.yaml
+
+$  kubectl create namespace dev-service1
+
+4.   Create test namespace:
+
+$  kubectl apply -f /pods-manifests/test-namespace.yaml
+
+5.   List all namespaces:
+
+$   kubectl get namespaces
+
+6.   Delete a Namespace: To delete a namespace there are two options, we can use a yaml file or a single command:
+
+$     kubectl delete -f /pods-manifests/test-namespace.yaml
+
+or
+
+$   kubectl delete namespace test
+
+7.    Check that the test namespace has been successfully deleted:
+
+$   kubectl get namespaces
+
+Note: We are not going to remove dev-service1 namespace as we will use it.
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+9.   Create a Pod  By using the kubectl cli tool, we authenticate to the Kubernetes API and apply our Pod specification to the Kubernetes Cluster:
+
+$  echo "
+apiVersion: v1
+
+kind: Pod
+metadata:
+  
+name: happypanda
+spec:
+  
+containers:
+
+  - name: nginx
+
+    image: nginx"> pod.yaml
+
+$  kubectl apply -f /pods-manifests/pod.yaml
+
+10.  Validation In order to validate if happypanda pod is running, we need to ask the Kubernetes API as follows:
+
+$   kubectl get pods
+
+--- Notice that happypanda pod is running in the default namespace as we didn't set any namespace in our specification.
+
+11.  Delete a Pod  We can delete pods by using a YAML file or a single command:
+
+$   kubectl delete -f /pods-manifests/pod.yaml
+
+or
+
+$  kubectl delete pod happypanda
+
+12.  Check happypanda pod has been deleted:
+
+$   kubectl get pods
+
+-------------------------------------------------------------------
+
+13.   Schedule a pod in a namespace Look at the file pod-namespace.yaml
+-- Notice that happypanda pod has been configured to be scheduled in the dev-service1 namespace.
+-- Let's apply this yaml file:
+
+$   echo "
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: happypanda
+
+  namespace: dev-service1
+
+spec:
+
+  containers:
+
+  - name: nginx
+
+    image: nginx"> pod-namespace.yaml
+
+14.    Updating pod We are going to update our happypanda pod running in dev-service1 namespace and to do that you need to apply pod-update.yaml.
+Look at the file /pod-update.yaml:
+   -  Pods labels has been added in the metadata section
+   -  Container image has been updated in the containers section. Notice that you can specify image tags if not, latest is used.
+   -  Pod ports has been added in the containers section
+
+$ echo"
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: happypanda
+
+  namespace: dev-service1
+
+  labels:
+ 
+    app: redis
+
+    segment: backend
+
+    company: mycompany
+
+spec:
+
+  containers:
+
+  - name: redis
+
+    image: redis:4.0.10
+
+    ports:
+
+    - name: redisport
+
+      containerPort: 6379
+
+      protocol: TCP"> pod-namespace.yaml
+
+15  Update Pod --A pod can be updated by applying a yaml file, let's apply our pod-update.yaml file with the above changes:
+
+$   kubectl apply -f /pods-manifests/pod-update.yaml
+
+16    Didn't it work? What happened?
+---The error we are getting is the following:
+-   The Pod "happypanda" is invalid: spec: Forbidden: pod updates may not change fields other than
+  `spec.containers[*].image`,
+  `spec.initContainers[*].image`,
+  `spec.activeDeadlineSeconds` or   `spec.tolerations` (only additions to existing tolerations)
+Ok, let's review the Kubernetes API Reference and we can find the following statement in containers ports specification:
+In Kubernetes, there're some fields can't be updated. Kubernetes API Reference is helping you out to know the API restrictions and the exact object specification which are available.
+In order to update those forbidden updates, we should delete the pod and create it up again. We could bypass these situations with "deployments" which we will cover in other chapter.
+
+17.   Fixing it - Delete the pod:
+
+$   kubectl delete pod happypanda -n dev-service1
+
+18.   Apply the yaml file:
+
+$    kubectl apply -f /pods-manifests/pod-update.yaml
+
+19.  Check it out:
+
+$   kubectl describe pod happypanda --namespace dev-service1
+
+----Our happypanda pod is now running with labels, port specification and a new container image!
+
+$   kubectl get pod -n dev-service1
+
+20.  Clean up  Delete pod:
+
+$   kubectl delete pod happypanda -n dev-service1
+
+21  Delete namespace:
+
+$   kubectl delete namespace dev-service1
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+
+kubectl apply -f /pods-manifests/pod-namespace.yaml
+
+Validation
+Let's have a look at pods running in dev-service1 namespace:
+
+kubectl get pods -n dev-service1
+
+Great! The happypanda pod is running in the dev-service1 namespace!
+
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Jobs, Init Containers and Cron Jobs
+ 
+1.     Jobs resources are used to running a batch job, supporting parallel jobs until reach a specific number of completions.
+        Therefore with Jobs, we can run a work items such as frames to be rendered, files to be transcoded, ranges of keys in a NoSQL database to scan, and so on.
+        Take a look at Jobs Api reference to see how to build a job resource in Kubernetes.
+
+         Pods created by jobs are not deleted. Keeping them around allows you to still view the logs of completed pods to check for errors. If you want to remove them, you need to do that manually.
+ 
+        Create Countdown Job Look at the file job.yaml.
+---------------------------
+$ echo "
+apiVersion: batch/v1
+
+kind: Job
+
+metadata:
+
+  name: countdown
+
+spec:
+
+  template:
+
+    spec:
+
+      containers:
+
+      - name: countdown
+
+        image: bash
+
+        command: ["/bin/sh",  "-c"]
+
+        args:
+ 
+          - for i in 9 8 7 6 5 4 3 2 1 ; do echo $i ; done &&
+
+            echo Perfect!
+ 
+      restartPolicy: OnFailure">job.yaml
+-----------------------------------------------
+
+This example creates a job which runs a bash command to countdown from 10 to 1.
+Notice that the field spec.restartPolicy just allow two values: "OnFailure" or "Never", for further information read here
+
+Note: There're situations where you want to fail a job after some ammount of retries, to do so use spec.backoffLimit. It is set by default to 6. You could want to manage the duration of the job, not matter how many Pods are created. You can use spec.activeDeadlineSeconds and once a Job reaches this value(in sec), the Job and all of its Pods are terminates.
+
+2.    Create the countdown job:
+
+$    kubectl apply -f /manifests/job.yaml
+
+3.    Job status Check the status of the job:
+
+$   kubectl get jobs
+
+4.   Job Logs  In order to see the job's logs we need to get the job name:
+
+$    kubectl get pods -o 'jsonpath={.items[0].metadata.name}'; echo
+
+   ---   And then execute the following command to get the logs:
+
+$   kubectl logs `kubectl get pods -o 'jsonpath={.items[0].metadata.name}'`
+
+You will get a result like:
+
+9
+8
+7
+6
+5
+4
+3
+2
+1
+Perfect!
+
+5.    Delete Job
+
+$   kubectl delete -f /manifests/job.yaml
+or
+$   kubectl delete job countdown
+
+-------------------------------------------------------------
+
+
+1.    Parallel Jobs To create a parallel job we can use spec.parallelism to set how many pods we want to run in parallel and spec.completions to set how many job's completition we would like to achieve.
+
+   Create Countdown Parallel Job Look at the file jobs-parallels.yaml.
+---------------------------
+$ echo "
+apiVersion: batch/v1
+
+kind: Job
+
+metadata:
+
+  name: countdown
+
+spec:
+
+  completions: 8
+
+  parallelism: 2
+  template:
+
+    spec:
+
+      containers:
+
+      - name: countdown
+
+        image: bash
+
+        command: ["/bin/sh",  "-c"]
+
+        args:
+ 
+          - for i in 9 8 7 6 5 4 3 2 1 ; do echo $i ; done &&
+
+            echo Perfect!
+ 
+      restartPolicy: OnFailure">jobs-parallels.yaml
+-----------------------------------------------
+
+
+2.    This is the same countdown job then the previous scenario but we have added spec.parallelism and spec.completions.
+       The job will run 2 pods in parallel until it reaches 8 completions successfully.
+       Create countdown parallel job:
+
+$   kubectl apply -f /manifests/jobs-parallels.yaml
+
+3.    Job status Await for a few seconds to get the 8 completions and then check the status of the job:
+
+$    kubectl get jobs
+
+4.   You should see a result like the following if not, wait for a few seconds and check again:
+
+      NAME        DESIRED   SUCCESSFUL   AGE
+      countdown   8         8            16s
+      This job was executed successfully 8 time by keeping 2 jobs running in parallel.
+
+5.   Job Logs  In order to see the job's logs, we need to get the job name:
+
+$    kubectl get pods -o 'jsonpath={.items[0].metadata.name}'; echo
+
+     And then execute the following command to get the logs:
+
+$   kubectl logs `kubectl get pods -o 'jsonpath={.items[0].metadata.name}'`
+
+You will get a result like:
+9
+8
+7
+6
+5
+4
+3
+2
+1
+Perfect!
+
+6    Delete Job
+
+$     kubectl delete -f /manifests/jobs-parallels.yaml
+
+or
+
+$     kubectl delete job countdown
+--------------------------------------
+
+1.    Cron Jobs  Cron Job resources run a job periodically on a given schedule, written in a Cron format.
+   --- They are useful for creating periodic and recurring tasks, e.g running backups or sending emails.
+
+   Create Hello Cron Job  Look at the file cronjob.yaml. 
+  This example create a job every minute which prints the current time and a hello message.
+-----
+$ echo"
+apiVersion: batch/v1beta1
+
+kind: CronJob
+
+metadata:
+
+  name: hello
+
+spec:
+
+  schedule: "*/1 * * * *"
+
+  jobTemplate:
+
+    spec:
+
+      template:
+
+        spec:
+
+          containers:
+
+          - name: hello
+
+            image: busybox
+
+            args:
+
+            - /bin/sh
+
+            - -c
+
+            - date; echo Hello from the Kubernetes cluster
+
+          restartPolicy: OnFailure
+-------
+
+$   kubectl apply -f /manifests/cronjob.yaml
+
+3.   Cron Job status Check the status of the cronjob:
+
+$    kubectl get cronjob hello
+
+After creating the cron job you can see, by looking at LAST-SCHEDULE column, that it hasn't been scheduled yet:
+
+master $ kubectl get cronjob hello
+
+NAME      SCHEDULE      SUSPEND   ACTIVE    LAST SCHEDULE   AGE
+hello     */1 * * * *   False     0         <none>          8s
+
+4.   Watch the job until LAST-SCHEDULE column get a value, it means it began to run:
+
+$    kubectl get cronjob --watch
+
+5.    Check the cron job again, you should see that the cronjob has been scheduled at the time specified in LAST-SCHEDULE:
+
+$    kubectl get cronjob hello
+
+6.    Cron Job Logs In order to see the job's logs, we need to know the pod created:
+
+$     kubectl get pod -o 'jsonpath={.items[0].metadata.name}'; echo
+
+And then:
+
+$    kubectl logs `kubectl get pod -o 'jsonpath={.items[0].metadata.name}'`
+
+7     Delete Cron Job
+
+$     kubectl delete cronjob hello
+-----------------------------------------------------
+
+1.   Init Container  Init Container is a container which is executed before the app container is started. Init-containers are usually used for deploying utilities or execute scripts which are not presented in the app image and it needs to run.
+
+Create a Pod with an init container  Look at the file init-container.yaml.
+----
+$ echo "
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: happypanda
+
+spec:
+
+  containers:
+
+  - name: busybox
+
+    image: busybox:latest
+    command: ["/bin/sh", "-c"]
+    args: ["cat /opt/workdir/helloworld && sleep 3600"]
+    volumeMounts:
+    - name: workdir
+      mountPath: /opt/workdir
+  initContainers:
+  - name: init-container
+    image: busybox
+
+    command:
+
+            - sh
+
+            - -c
+
+            - 'echo "The app is running" > /opt/workdir/helloworld'
+
+    volumeMounts:
+
+    - mountPath: /opt/workdir
+
+      name: workdir
+
+  volumes:
+
+  - name: workdir
+
+    emptyDir: {}">init-container.yaml
+----
+
+2           This example runs an init-container which creates a helloworld file in a volume and an application pod will be scheduled if the helloworld file exist in a specific path and it can read it.
+          Create the init container:
+
+$      kubectl apply -f /manifests/init-container.yaml
+
+It could get some time until the init container finish successfully and the pod run.
+
+3    Pod status  Init container get some time until it creates the file so you could have to check the status of the pod couple of times:
+
+$     kubectl get pods
+
+4.    If the pod is running means that the file was created and the pod can read it.
+       We are going to check manually that the file is there with the correct content:
+
+$       kubectl exec -ti happypanda -- cat /opt/workdir/helloworld
+
+You should see a result like: 
+
+The app is running
+
+5.   Delete Pod
+
+$    kubectl delete -f /manifests/init-container.yaml
+
+or
+
+$    kubectl delete pod happypanda
+
+-----------------------------------
+
+Overview
+A DaemonSet ensures that all (or some) Nodes run a copy of a Pod. As nodes are added to the cluster, Pods are added to them. As nodes are removed from the cluster, those Pods are garbage collected. Deleting a DaemonSet will clean up the Pods it created.
+
+Some typical uses of a DaemonSet are:
+
+-   running a cluster storage daemon, such as glusterd and ceph, on each node.
+-   running a logs collection daemon on every node, such as fluentd or logstash.
+-   running a node monitoring daemon on every node, such as Prometheus Node Exporter (node_exporter), collectd, Datadog agent, New Relic agent, or Ganglia gmond.
+
+In a simple case, one DaemonSet, covering all nodes, would be used for each type of daemon. A more complex setup might use multiple DaemonSets for a single type of daemon, but with different flags and/or different memory and cpu requests for different hardware types.
+
+
+1.   Create a DaemonSet In this scenario, we're going to be creating an nginx DaemonSet. Initially, we'll run this on our worker nodes (node01), but then we will manipulate the DaemonSet to get it running on the master node too.
+nginx DaemonSet
+   In your terminal, you'll see a file named nginx-daemonset.yaml. This is the DaemonSet which we will be using to run nginx across both of our nodes.
+   First, let's create all the prerequisites needed for this DaemonSet to run:
+
+$     kubectl create -f nginx-ds-prereqs.yaml
+
+Now we've created the namespace (and other prerequisites), let's inspect the manifest for the nginx DaemonSet:
+
+cat nginx-daemonset.yaml; echo
+
+As you can see, we're running a basic DaemonSet - in the  contino namespace - which exposes port 80 inside the container.
+
+Create it:
+
+kubectl create -f nginx-daemonset.yaml
+
+Now check the status of the DaemonSet:
+
+kubectl get daemonsets -n contino
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
