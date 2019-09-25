@@ -11,12 +11,18 @@ Step-3
 Nginx and MySQL, configured by following the Nginx and MySQL sections in this LEMP installation guide.
 https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-ubuntu-18-04
 
+----------------
+How To Set Up a Firewall with UFW on Ubuntu 16.04
+https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-16-04
+-----------------
+
+
 Step-4
-Certbot (the Let’s Encrypt client), configured by following How To Secure Nginx with Let’s Encrypt on Ubuntu 18.04.
-https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-18-04#step-1-—-installing-certbot
+Certbot (the Letâ€™s Encrypt client), configured by following How To Secure Nginx with Letâ€™s Encrypt on Ubuntu 18.04.
+https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-18-04#step-1-â€”-installing-certbot
 
 Step-5
-A fully-qualified domain name and an A record pointing to the server where you’ll install SonarQube. If you’re using DigitalOcean’s DNS service, this DNS record setup guide will help you set that up. We’ll use sonarqube.example.com in this tutorial.
+A fully-qualified domain name and an A record pointing to the server where youâ€™ll install SonarQube. If youâ€™re using DigitalOceanâ€™s DNS service, this DNS record setup guide will help you set that up. Weâ€™ll use sonarqube.example.com in this tutorial.
 
 
 Step-6
