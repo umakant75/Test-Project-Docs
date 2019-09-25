@@ -1,5 +1,5 @@
-Introduction to Linux command ‘sudo’
-sudo stands for superuser do. In Ubuntu Linux there is not root account configured by default. If users want root account password then they can manually set it up oo can use ‘sudo’. As we all know, Linux in many ways protects users’ computer being used for bad purposes by some nasty people around us. Using sudo is one of those good ways.
+Introduction to Linux command â€˜sudoâ€™
+sudo stands for superuser do. In Ubuntu Linux there is not root account configured by default. If users want root account password then they can manually set it up oo can use â€˜sudoâ€™. As we all know, Linux in many ways protects usersâ€™ computer being used for bad purposes by some nasty people around us. Using sudo is one of those good ways.
 sudo command works in conjunction with security policies, default security policy is sudoers and it is configurable via /etc/sudoers file. Its security policies are highly extendable. One can develop and distribute their own policies as plugins.
 
 1) Edit /etc/sudoers file as follows:
@@ -13,13 +13,13 @@ sudo command works in conjunction with security policies, default security polic
 Install Sudo on Ubuntu and Debian
 	apt install sudo
 
-user wants to update the operating system by passing command – 	
+user wants to update the operating system by passing command â€“ 	
 	apt-get update
 
 The above command will give following error-
 	apt-get update error
 
-This error is due to not having root privileges to the user ‘sandy’. The root privileges can be required by passing sudo at the very beginning, like below-
+This error is due to not having root privileges to the user â€˜sandyâ€™. The root privileges can be required by passing sudo at the very beginning, like below-
 	sudo apt-get update
 
 This command will install packages with the root privileges.
@@ -31,7 +31,7 @@ This command will remove packages with the root privileges.
 This command will update packages with the root privileges.
 	sudo apt-get update {package-name}
 
-The Linux command ‘su’ is used to switch from one account to another. User will be prompted for the password of the user switching to.
+The Linux command â€˜suâ€™ is used to switch from one account to another. User will be prompted for the password of the user switching to.
 	$ su linuxandubuntu
 	password:
 	linuxandubuntu@sandy:~$
@@ -43,7 +43,16 @@ By default, sudo will ask you to enter your password again after five minutes of
 
 Set the default timeout by adding the line below, where 10 is the timeout specified in minutes:
 	Defaults  timestamp_timeout=10
-
+=======================
+ggranth12@instance-sonarq1:~$ sudo -i
+root@instance-sonarq1:~# ls
+root@instance-sonarq1:~# sudo bash
+root@instance-sonarq1:~# sudo passwd root
+Enter new UNIX password: 
+Retype new UNIX password: 
+passwd: password updated successfully
+root@instance-sonarq1:~# cd /root
+===========
 
 1. Essential commands
 
