@@ -3,7 +3,7 @@
 # Build, test, package, or publish a dotnet application, or run a custom dotnet command
 - task: DotNetCoreCLI@2
   inputs:
-    #command: 'build' # Options: build, push, pack, publish, restore, run, test, custom
+    command: 'build' # Options: build, push, pack, publish, restore, run, test, custom
     #publishWebProjects: true # Required when command == Publish
     #projects: # Optional
     #custom: # Required when command == Custom
